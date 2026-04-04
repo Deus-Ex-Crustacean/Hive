@@ -1,15 +1,52 @@
 {
   "ego": {
     "url": "http://localhost:4000",
-    "clientId": "",
-    "clientSecret": ""
+    "clientId": "hive-admin",
+    "clientSecret": "9b78448c687edd998cd6ac068289f77b37e8d871df24a21e1263ff03913437d7"
   },
   "cortex": {
     "url": "http://localhost:4100",
-    "sourceId": "",
-    "sourceSecret": ""
+    "sourceId": "31b1b5da-13b1-47f8-9f14-ae94909e4fbb",
+    "sourceSecret": "91b6ae2e2661478da5d0af937f99a9851d872efdae164d039204ab3a4ccf0345"
   },
   "defaultSubscriptions": [],
   "groupSubscriptions": {},
-  "workspaces": []
+  "workspaces": [
+    {
+      "id": "6759de93-0863-4dfb-b1aa-eef4c668698a",
+      "name": "Ego",
+      "path": "/home/brooswit/Code/Deus-Ex-Crust/Ego",
+      "machineUserId": "b218e010-6746-44ac-81b0-04801e377dee",
+      "machineUserClientId": "Ego",
+      "machineUserClientSecret": "2deb6b0b684e829e42ce7b208ffabd4c89d135262300e65064aec42176b58a5a",
+      "enabled": true
+    },
+    {
+      "id": "55bba2ea-c3cf-4119-bd34-bc30e639abef",
+      "name": "Cortex",
+      "path": "/home/brooswit/Code/Deus-Ex-Crust/Cortex",
+      "machineUserId": "999e4f6f-03bb-4f1f-a5dd-d458ba922df7",
+      "machineUserClientId": "Cortex",
+      "machineUserClientSecret": "55a8d37230b99e52a941e1166cd6c9da0ee6eaf52066a54aa504a5ecb36aa726",
+      "enabled": true
+    },
+    {
+      "id": "d8e5d32c-206b-4a40-9019-d08aadcf5606",
+      "name": "Hive",
+      "path": "/home/brooswit/Code/Deus-Ex-Crust/Hive",
+      "machineUserId": "c0594935-75d4-485d-84a1-8341a85f7af0",
+      "machineUserClientId": "Hive",
+      "machineUserClientSecret": "3727692bd09f612ba88d045ebed159fcc76ce846fbc12a8e7278da491b28ace1",
+      "enabled": true
+    },
+    {
+      "id": "c35f3be1-bffe-499b-8466-a76cedcb9e72",
+      "name": "Synapse",
+      "path": "/home/brooswit/Code/Deus-Ex-Crust/Synapse",
+      "machineUserId": "2cac34d8-1c0b-46a9-88f5-dc529202fd61",
+      "machineUserClientId": "Synapse",
+      "machineUserClientSecret": "3526b658efda9632b7fbaa04cf8f77719eab76fb4bb15e037d426f993f61a2fb",
+      "enabled": true
+    }
+  ]
 }
