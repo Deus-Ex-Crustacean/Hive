@@ -100,6 +100,11 @@ function startMockCortex(): Server {
       const url = new URL(req.url);
       const path = url.pathname;
 
+      // GET /admin/sources
+      if (req.method === "GET" && path === "/admin/sources") {
+        return Response.json(Object.values(cortexSources));
+      }
+
       // POST /admin/sources
       if (req.method === "POST" && path === "/admin/sources") {
         const body = await req.json();
@@ -374,7 +379,7 @@ describe("Workspace messaging", () => {
 
   test("message was pushed as webhook with correct event type", () => {
     expect(cortexWebhooks.length).toBe(1);
-    expect(cortexWebhooks[0].type).toBe(`message.${workspaceId}`);
+    expect(cortexWebhooks[0].type).toBe(`prompt.${workspaceId}`);
     expect(cortexWebhooks[0].message).toBe("hello workspace");
   });
 

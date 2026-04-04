@@ -55,7 +55,23 @@ export async function authenticate(): Promise<void> {
   const data = (await res.json()) as { access_token: string };
   accessToken = data.access_token;
 
-  // Step 3: Register as Cortex source if needed
+  // Step 3: Verify Cortex source still exists, re-register if needed
+  if (config.cortex.sourceId) {
+    const verifyRes = await fetch(`${config.cortex.url}/admin/sources`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (verifyRes.ok) {
+      const sources = (await verifyRes.json()) as { id: string }[];
+      const found = sources.some((s) => s.id === config.cortex.sourceId);
+      if (!found) {
+        console.log("Cortex source not found (DB reset?), re-registering...");
+        config.cortex.sourceId = "";
+        config.cortex.sourceSecret = "";
+        saveConfig();
+      }
+    }
+  }
+
   if (!config.cortex.sourceId) {
     console.log("Seeding: registering as webhook source on Cortex...");
     const srcRes = await fetch(`${config.cortex.url}/admin/sources`, {
