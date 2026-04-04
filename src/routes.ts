@@ -15,6 +15,7 @@ import {
   isRunning,
   getWorkspaceLogs,
   getProcess,
+  injectLog,
 } from "./synapse";
 
 type Handler = (req: Request, params: Record<string, string>) => Promise<Response> | Response;
@@ -240,6 +241,8 @@ route("POST", "/workspaces/:id/message", async (req, params) => {
 
   const body = (await req.json()) as { message: string };
   if (!body.message) return err("message is required");
+
+  injectLog(ws.id, `▶ You: ${body.message}`);
 
   await pushEvent(`message.${ws.id}`, {
     workspaceId: ws.id,

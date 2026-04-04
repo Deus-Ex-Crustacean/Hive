@@ -122,3 +122,8 @@ export function getWorkspaceLogs(workspaceId: string): string[] {
 export function getProcess(workspaceId: string): ManagedProcess | undefined {
   return processes.get(workspaceId);
 }
+
+export function injectLog(workspaceId: string, line: string): void {
+  const managed = processes.get(workspaceId);
+  if (managed) appendLog(managed, line);
+}
