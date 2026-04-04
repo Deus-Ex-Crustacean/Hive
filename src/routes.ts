@@ -9,7 +9,6 @@ import {
 import { provisionMachineUser, deprovisionMachineUser } from "./ego";
 import { pushEvent } from "./cortex";
 import {
-  installSynapse,
   startWorkspace,
   stopWorkspace,
   isRunning,
@@ -85,8 +84,6 @@ route("POST", "/workspaces", async (req) => {
 
   config.workspaces.push(workspace);
   saveConfig();
-
-  await installSynapse(workspace.path);
 
   if (workspace.enabled) {
     await startWorkspace(workspace.id);

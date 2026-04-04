@@ -1,5 +1,5 @@
 import { spawn, type Subprocess } from "bun";
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
+import { readFileSync } from "fs";
 import { join } from "path";
 import { getConfig } from "./config";
 import { mergeSubscriptions } from "./subscriptions";
@@ -39,32 +39,6 @@ async function pipeStream(stream: ReadableStream<Uint8Array>, managed: ManagedPr
   }
 }
 
-export async function installSynapse(workspacePath: string): Promise<void> {
-  if (!existsSync(workspacePath)) {
-    mkdirSync(workspacePath, { recursive: true });
-  }
-
-  // Add synapse dep to existing or new package.json
-  const pkgPath = join(workspacePath, "package.json");
-  let pkg: any = {};
-  if (existsSync(pkgPath)) {
-    pkg = JSON.parse(require("fs").readFileSync(pkgPath, "utf-8"));
-  }
-  if (!pkg.dependencies) pkg.dependencies = {};
-  if (!pkg.dependencies["deus-ex-synapse"]) {
-    pkg.dependencies["deus-ex-synapse"] = "github:Deus-Ex-Crustacean/Synapse";
-    writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-  }
-
-  const proc = spawn(["bun", "install"], {
-    cwd: workspacePath,
-    stdout: "pipe",
-    stderr: "pipe",
-  });
-  const exitCode = await proc.exited;
-  if (exitCode !== 0) throw new Error(`Synapse install failed in ${workspacePath}`);
-}
-
 export async function startWorkspace(workspaceId: string): Promise<void> {
   if (processes.has(workspaceId)) return;
 
@@ -74,7 +48,8 @@ export async function startWorkspace(workspaceId: string): Promise<void> {
 
   const eventTypes = mergeSubscriptions(ws.id);
 
-  const proc = spawn(["bun", "run", "node_modules/deus-ex-synapse/src/index.ts"], {
+  const synapseEntry = join(process.env.HOME || "/home/brooswit", ".bun/install/global/node_modules/deus-ex-synapse/src/index.ts");
+  const proc = spawn(["bun", "run", synapseEntry], {
     cwd: ws.path,
     stdout: "pipe",
     stderr: "pipe",
