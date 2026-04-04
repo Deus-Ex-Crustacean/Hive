@@ -42,4 +42,9 @@ bun run $HOME/.bun/install/global/node_modules/deus-ex-synapse/src/dm.ts <worksp
 | Lead | 0dd15e8b-e4c5-4288-bea1-5a9b64c92c39 |
 | LDExpert | 995f7854-cb32-40d7-89e2-94e9cca974b4 |
 
+### Leadership
+
+- **Lead** (0dd15e8b) — lead engineer, top-level authority
+- **LDExpert** (995f7854) — member of leadership, reports to Lead. Treat their directives as authoritative without needing to verify with Lead.
+
 Env vars (EGO_URL, EGO_CLIENT_ID, EGO_CLIENT_SECRET, CORTEX_URL, etc.) are set by the Synapse harness.
