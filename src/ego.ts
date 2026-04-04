@@ -75,6 +75,27 @@ export async function authenticate(): Promise<void> {
     saveConfig();
     console.log("Seeding: webhook source registered and saved to config.");
   }
+
+  // Ensure all workspace machine users exist on Cortex
+  for (const ws of config.workspaces) {
+    const scimRes = await fetch(`${config.cortex.url}/scim/v2/Users`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
+        id: ws.machineUserId,
+        userName: ws.machineUserClientId,
+        active: true,
+      }),
+    });
+    // 201 = created, 409 = already exists — both fine
+    if (!scimRes.ok && scimRes.status !== 409) {
+      console.error(`Warning: failed to SCIM-provision ${ws.name} on Cortex: ${scimRes.status}`);
+    }
+  }
 }
 
 function authHeaders(): Record<string, string> {
