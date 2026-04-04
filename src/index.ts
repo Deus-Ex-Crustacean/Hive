@@ -8,8 +8,8 @@ import { matchRoute } from "./routes";
 const PORT = parseInt(process.env.PORT ?? "3000", 10);
 const ADMIN_TOKEN = process.env.HIVE_ADMIN_TOKEN;
 
-const LD_SDK_KEY = "sdk-fadd54c8-967d-40ac-8848-e75fe4f28cb6";
-export const ldClient = LaunchDarkly.init(LD_SDK_KEY, {
+const LD_SDK_KEY = process.env.LD_SDK_KEY;
+export const ldClient = LD_SDK_KEY ? LaunchDarkly.init(LD_SDK_KEY, {
   plugins: [
     new Observability({
       serviceName: "hive",
@@ -17,7 +17,7 @@ export const ldClient = LaunchDarkly.init(LD_SDK_KEY, {
       environment: "production",
     }),
   ],
-});
+}) : null;
 export const ldContext: LaunchDarkly.LDContext = {
   kind: "service",
   key: "hive",
@@ -28,9 +28,13 @@ async function startup() {
   console.log("Loading config...");
   loadConfig();
 
-  console.log("Initializing LaunchDarkly...");
-  await ldClient.waitForInitialization({ timeout: 10 });
-  console.log("LaunchDarkly client ready.");
+  if (ldClient) {
+    console.log("Initializing LaunchDarkly...");
+    await ldClient.waitForInitialization({ timeout: 10 });
+    console.log("LaunchDarkly client ready.");
+  } else {
+    console.log("LD_SDK_KEY not set, skipping LaunchDarkly.");
+  }
 
   console.log("Authenticating with Ego...");
   await authenticate();
@@ -81,11 +85,11 @@ startup().catch((e) => {
 });
 
 process.on("SIGINT", () => {
-  ldClient.close();
+  ldClient?.close();
   process.exit(0);
 });
 process.on("SIGTERM", () => {
-  ldClient.close();
+  ldClient?.close();
   process.exit(0);
 });
 
