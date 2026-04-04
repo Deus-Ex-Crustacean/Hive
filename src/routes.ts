@@ -241,9 +241,9 @@ route("POST", "/workspaces/:id/message", async (req, params) => {
   const body = (await req.json()) as { message: string };
   if (!body.message) return err("message is required");
 
-  injectLog(ws.id, `▶ You: ${body.message}`);
+  injectLog(ws.id, `▶ Prompt: ${body.message}`);
 
-  await pushEvent(`message.${ws.id}`, {
+  await pushEvent(`prompt.${ws.id}`, {
     workspaceId: ws.id,
     workspaceName: ws.name,
     message: body.message,
