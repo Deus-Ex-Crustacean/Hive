@@ -109,6 +109,18 @@ function startMockCortex(): Server {
         return Response.json({ id, secret }, { status: 201 });
       }
 
+      // POST /scim/v2/Users
+      if (req.method === "POST" && path === "/scim/v2/Users") {
+        const body = await req.json();
+        return Response.json({ id: body.id, userName: body.userName }, { status: 201 });
+      }
+
+      // DELETE /scim/v2/Users/:id
+      const scimDeleteMatch = path.match(/^\/scim\/v2\/Users\/([^/]+)$/);
+      if (req.method === "DELETE" && scimDeleteMatch) {
+        return new Response(null, { status: 204 });
+      }
+
       // POST /webhooks/:sourceId
       const webhookMatch = path.match(/^\/webhooks\/([^/]+)$/);
       if (req.method === "POST" && webhookMatch) {
