@@ -88,18 +88,43 @@ function authHeaders(): Record<string, string> {
 export async function provisionMachineUser(
   username: string
 ): Promise<{ id: string; username: string; client_secret: string }> {
-  const { ego } = getConfig();
+  const { ego, cortex } = getConfig();
+
+  // Create user on Ego
   const res = await fetch(`${ego.url}/admin/users`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({ username, machine: true }),
   });
   if (!res.ok) throw new Error(`Ego provision failed: ${res.status} ${await res.text()}`);
-  return res.json() as Promise<{ id: string; username: string; client_secret: string }>;
+  const user = (await res.json()) as { id: string; username: string; client_secret: string };
+
+  // SCIM-provision user on Cortex so they can subscribe to events
+  const scimRes = await fetch(`${cortex.url}/scim/v2/Users`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({
+      schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
+      id: user.id,
+      userName: user.username,
+      active: true,
+    }),
+  });
+  if (!scimRes.ok) throw new Error(`Cortex SCIM provision failed: ${scimRes.status} ${await scimRes.text()}`);
+
+  return user;
 }
 
 export async function deprovisionMachineUser(userId: string): Promise<void> {
-  const { ego } = getConfig();
+  const { ego, cortex } = getConfig();
+
+  // Remove from Cortex
+  await fetch(`${cortex.url}/scim/v2/Users/${userId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+
+  // Remove from Ego
   const res = await fetch(`${ego.url}/admin/users/${userId}`, {
     method: "DELETE",
     headers: authHeaders(),
