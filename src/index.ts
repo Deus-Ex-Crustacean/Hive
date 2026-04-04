@@ -1,4 +1,5 @@
 import * as LaunchDarkly from "@launchdarkly/node-server-sdk";
+import { Observability } from "@launchdarkly/observability-node";
 import { loadConfig, getConfig } from "./config";
 import { authenticate } from "./ego";
 import { startWorkspace } from "./synapse";
@@ -8,7 +9,15 @@ const PORT = parseInt(process.env.PORT ?? "3000", 10);
 const ADMIN_TOKEN = process.env.HIVE_ADMIN_TOKEN;
 
 const LD_SDK_KEY = "sdk-699cdf13-faef-4bf9-99dc-1dd8972f1fa9";
-export const ldClient = LaunchDarkly.init(LD_SDK_KEY);
+export const ldClient = LaunchDarkly.init(LD_SDK_KEY, {
+  plugins: [
+    new Observability({
+      serviceName: "hive",
+      serviceVersion: "1.0.0",
+      environment: "test",
+    }),
+  ],
+});
 export const ldContext: LaunchDarkly.LDContext = {
   kind: "service",
   key: "hive",

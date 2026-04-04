@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@launchdarkly/node-server-sdk": "^9.10.10",
+    "@launchdarkly/observability-node": "^1.1.0",
     "bun-types": "^1.3.11",
     "deus-ex-synapse": "github:Deus-Ex-Crustacean/Synapse"
   }
