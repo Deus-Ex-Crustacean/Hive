@@ -8,13 +8,13 @@ import { matchRoute } from "./routes";
 const PORT = parseInt(process.env.PORT ?? "3000", 10);
 const ADMIN_TOKEN = process.env.HIVE_ADMIN_TOKEN;
 
-const LD_SDK_KEY = "sdk-699cdf13-faef-4bf9-99dc-1dd8972f1fa9";
+const LD_SDK_KEY = "sdk-fadd54c8-967d-40ac-8848-e75fe4f28cb6";
 export const ldClient = LaunchDarkly.init(LD_SDK_KEY, {
   plugins: [
     new Observability({
       serviceName: "hive",
       serviceVersion: "1.0.0",
-      environment: "test",
+      environment: "production",
     }),
   ],
 });
