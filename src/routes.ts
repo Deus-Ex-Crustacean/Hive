@@ -16,6 +16,7 @@ import {
   getWorkspaceLogs,
   getProcess,
   injectLog,
+  getSynapseStatus,
 } from "./synapse";
 
 type Handler = (req: Request, params: Record<string, string>) => Promise<Response> | Response;
@@ -55,6 +56,7 @@ route("GET", "/workspaces", () => {
       path: ws.path,
       enabled: ws.enabled,
       running: isRunning(ws.id),
+      status: isRunning(ws.id) ? getSynapseStatus(ws.path) : "stopped",
     }))
   );
 });
@@ -106,7 +108,7 @@ route("GET", "/workspaces/:id", (_req, params) => {
   const config = getConfig();
   const ws = config.workspaces.find((w) => w.id === params.id);
   if (!ws) return err("Workspace not found", 404);
-  return json({ id: ws.id, name: ws.name, path: ws.path, enabled: ws.enabled, running: isRunning(ws.id) });
+  return json({ id: ws.id, name: ws.name, path: ws.path, enabled: ws.enabled, running: isRunning(ws.id), status: isRunning(ws.id) ? getSynapseStatus(ws.path) : "stopped" });
 });
 
 route("PATCH", "/workspaces/:id", async (req, params) => {

@@ -1,5 +1,5 @@
 import { spawn, type Subprocess } from "bun";
-import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
 import { getConfig } from "./config";
 import { mergeSubscriptions } from "./subscriptions";
@@ -126,4 +126,12 @@ export function getProcess(workspaceId: string): ManagedProcess | undefined {
 export function injectLog(workspaceId: string, line: string): void {
   const managed = processes.get(workspaceId);
   if (managed) appendLog(managed, line);
+}
+
+export function getSynapseStatus(workspacePath: string): string {
+  try {
+    return readFileSync(join(workspacePath, "synapse.status"), "utf-8").trim();
+  } catch {
+    return "unknown";
+  }
 }
