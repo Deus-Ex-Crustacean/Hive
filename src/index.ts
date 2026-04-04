@@ -1,0 +1,60 @@
+import { loadConfig, getConfig } from "./config";
+import { authenticate } from "./ego";
+import { startWorkspace } from "./synapse";
+import { matchRoute } from "./routes";
+
+const PORT = parseInt(process.env.PORT ?? "3000", 10);
+const ADMIN_TOKEN = process.env.HIVE_ADMIN_TOKEN;
+
+async function startup() {
+  console.log("Loading config...");
+  loadConfig();
+
+  console.log("Authenticating with Ego...");
+  await authenticate();
+
+  const config = getConfig();
+  console.log(`Starting ${config.workspaces.filter((w) => w.enabled).length} enabled workspaces...`);
+
+  for (const ws of config.workspaces) {
+    if (ws.enabled) {
+      try {
+        await startWorkspace(ws.id);
+        console.log(`  ✓ ${ws.name}`);
+      } catch (e) {
+        console.error(`  ✗ ${ws.name}: ${e}`);
+      }
+    }
+  }
+
+  console.log("Startup complete.");
+}
+
+const server = Bun.serve({
+  port: PORT,
+  async fetch(req) {
+    // Auth check
+    const auth = req.headers.get("Authorization");
+    if (!ADMIN_TOKEN || auth !== `Bearer ${ADMIN_TOKEN}`) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const match = matchRoute(req.method, req.url);
+    if (!match) {
+      return Response.json({ error: "Not found" }, { status: 404 });
+    }
+
+    try {
+      return await match.handler(req, match.params);
+    } catch (e: any) {
+      console.error("Request error:", e);
+      return Response.json({ error: e.message ?? "Internal error" }, { status: 500 });
+    }
+  },
+});
+
+startup().catch((e) => {
+  console.error("Startup failed:", e);
+});
+
+console.log(`Hive listening on port ${PORT}`);

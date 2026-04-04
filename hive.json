@@ -1,0 +1,15 @@
+{
+  "ego": {
+    "url": "http://localhost:4000",
+    "clientId": "",
+    "clientSecret": ""
+  },
+  "cortex": {
+    "url": "http://localhost:4100",
+    "sourceId": "",
+    "sourceSecret": ""
+  },
+  "defaultSubscriptions": [],
+  "groupSubscriptions": {},
+  "workspaces": []
+}
