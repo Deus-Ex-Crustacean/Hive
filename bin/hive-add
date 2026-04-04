@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HIVE_URL="${HIVE_URL:-http://localhost:3000}"
+HIVE_ADMIN_TOKEN="${HIVE_ADMIN_TOKEN:?HIVE_ADMIN_TOKEN must be set}"
+
+if [ $# -lt 1 ]; then
+  echo "Usage: hive-add <path>" >&2
+  exit 1
+fi
+
+TARGET="$(cd "$1" && pwd)"
+NAME="$(basename "${TARGET}")"
+
+curl -s -X POST "${HIVE_URL}/workspaces" \
+  -H "Authorization: Bearer ${HIVE_ADMIN_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\": \"${NAME}\", \"path\": \"${TARGET}\", \"enabled\": true}" | python3 -m json.tool 2>/dev/null || cat
