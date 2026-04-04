@@ -44,22 +44,16 @@ export async function installSynapse(workspacePath: string): Promise<void> {
     mkdirSync(workspacePath, { recursive: true });
   }
 
+  // Add synapse dep to existing or new package.json
   const pkgPath = join(workspacePath, "package.json");
-  if (!existsSync(pkgPath)) {
-    writeFileSync(
-      pkgPath,
-      JSON.stringify(
-        {
-          name: "synapse-workspace",
-          version: "1.0.0",
-          dependencies: {
-            synapse: "github:Deus-Ex-Crustacean/Synapse",
-          },
-        },
-        null,
-        2
-      ) + "\n"
-    );
+  let pkg: any = {};
+  if (existsSync(pkgPath)) {
+    pkg = JSON.parse(require("fs").readFileSync(pkgPath, "utf-8"));
+  }
+  if (!pkg.dependencies) pkg.dependencies = {};
+  if (!pkg.dependencies["deus-ex-synapse"]) {
+    pkg.dependencies["deus-ex-synapse"] = "github:Deus-Ex-Crustacean/Synapse";
+    writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
   }
 
   const proc = spawn(["bun", "install"], {
@@ -80,7 +74,7 @@ export async function startWorkspace(workspaceId: string): Promise<void> {
 
   const eventTypes = mergeSubscriptions(ws.id);
 
-  const proc = spawn(["bun", "run", "node_modules/synapse/index.js"], {
+  const proc = spawn(["bun", "run", "node_modules/deus-ex-synapse/src/index.ts"], {
     cwd: ws.path,
     stdout: "pipe",
     stderr: "pipe",
