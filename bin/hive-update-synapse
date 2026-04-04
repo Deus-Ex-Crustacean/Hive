@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Removing old deus-ex-synapse..."
+bun remove -g deus-ex-synapse
+
+echo "Installing latest deus-ex-synapse..."
+bun install -g deus-ex-synapse@github:Deus-Ex-Crustacean/Synapse
+
+echo "Restarting Hive..."
+systemctl --user restart hive
