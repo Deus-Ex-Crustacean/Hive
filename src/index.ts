@@ -32,6 +32,7 @@ async function startup() {
 
 const server = Bun.serve({
   port: PORT,
+  idleTimeout: 0,
   async fetch(req) {
     // Auth check
     const auth = req.headers.get("Authorization");
