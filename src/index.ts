@@ -1,3 +1,4 @@
+import * as LaunchDarkly from "@launchdarkly/node-server-sdk";
 import { loadConfig, getConfig } from "./config";
 import { authenticate } from "./ego";
 import { startWorkspace } from "./synapse";
@@ -6,9 +7,21 @@ import { matchRoute } from "./routes";
 const PORT = parseInt(process.env.PORT ?? "3000", 10);
 const ADMIN_TOKEN = process.env.HIVE_ADMIN_TOKEN;
 
+const LD_SDK_KEY = "sdk-699cdf13-faef-4bf9-99dc-1dd8972f1fa9";
+export const ldClient = LaunchDarkly.init(LD_SDK_KEY);
+export const ldContext: LaunchDarkly.LDContext = {
+  kind: "service",
+  key: "hive",
+  name: "Hive",
+};
+
 async function startup() {
   console.log("Loading config...");
   loadConfig();
+
+  console.log("Initializing LaunchDarkly...");
+  await ldClient.waitForInitialization({ timeout: 10 });
+  console.log("LaunchDarkly client ready.");
 
   console.log("Authenticating with Ego...");
   await authenticate();
@@ -56,6 +69,15 @@ const server = Bun.serve({
 
 startup().catch((e) => {
   console.error("Startup failed:", e);
+});
+
+process.on("SIGINT", () => {
+  ldClient.close();
+  process.exit(0);
+});
+process.on("SIGTERM", () => {
+  ldClient.close();
+  process.exit(0);
 });
 
 console.log(`Hive listening on port ${PORT}`);
