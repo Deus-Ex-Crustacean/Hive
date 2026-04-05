@@ -1,4 +1,6 @@
 import { randomUUID } from "crypto";
+import { readFileSync, writeFileSync } from "fs";
+import { join } from "path";
 import {
   getConfig,
   saveConfig,
@@ -248,6 +250,48 @@ route("POST", "/workspaces/:id/message", async (req, params) => {
     workspaceName: ws.name,
     message: body.message,
   });
+
+  return json({ ok: true });
+});
+
+// --- Emergency ---
+
+route("POST", "/workspaces/:id/emergency", async (req, params) => {
+  const config = getConfig();
+  const ws = config.workspaces.find((w) => w.id === params.id);
+  if (!ws) return err("Workspace not found", 404);
+
+  const body = (await req.json()) as { message: string };
+  if (!body.message) return err("message is required");
+
+  // 1. Kill the running process
+  const managed = getProcess(ws.id);
+  if (managed) {
+    managed.proc.kill();
+  }
+
+  // 2. Write 'running' to synapse.status
+  writeFileSync(join(ws.path, "synapse.status"), "running");
+
+  // 3. Append system entry to conversation.json
+  const convPath = join(ws.path, "conversation.json");
+  let conversation: any[] = [];
+  try {
+    conversation = JSON.parse(readFileSync(convPath, "utf-8"));
+  } catch {}
+  conversation.push({
+    timestamp: Date.now(),
+    type: "system",
+    from: "system",
+    message: `Emergency interrupt: ${body.message}`,
+  });
+  writeFileSync(convPath, JSON.stringify(conversation, null, 2) + "\n");
+
+  injectLog(ws.id, `⚠ Emergency interrupt: ${body.message}`);
+
+  // 4. Process will restart automatically via Hive's process manager
+  // Re-start it now
+  await startWorkspace(ws.id);
 
   return json({ ok: true });
 });
