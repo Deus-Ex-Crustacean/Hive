@@ -59,6 +59,7 @@ route("GET", "/workspaces", () => {
       model: ws.model || "haiku",
       effort: ws.effort || "low",
       maxContextSize: ws.maxContextSize ?? 5,
+      executionDelay: ws.executionDelay ?? 2000,
     }))
   );
 });
@@ -108,7 +109,7 @@ route("GET", "/workspaces/:id", (_req, params) => {
   const config = getConfig();
   const ws = config.workspaces.find((w) => w.id === params.id);
   if (!ws) return err("Workspace not found", 404);
-  return json({ id: ws.id, name: ws.name, path: ws.path, enabled: ws.enabled, running: isRunning(ws.id), status: isRunning(ws.id) ? getSynapseStatus(ws.path) : "stopped", model: ws.model || "haiku", effort: ws.effort || "low", maxContextSize: ws.maxContextSize ?? 5 });
+  return json({ id: ws.id, name: ws.name, path: ws.path, enabled: ws.enabled, running: isRunning(ws.id), status: isRunning(ws.id) ? getSynapseStatus(ws.path) : "stopped", model: ws.model || "haiku", effort: ws.effort || "low", maxContextSize: ws.maxContextSize ?? 5, executionDelay: ws.executionDelay ?? 2000 });
 });
 
 route("PATCH", "/workspaces/:id", async (req, params) => {
@@ -123,6 +124,7 @@ route("PATCH", "/workspaces/:id", async (req, params) => {
     model?: string;
     effort?: string;
     maxContextSize?: number;
+    executionDelay?: number;
   };
 
   if (body.name !== undefined) ws.name = body.name;
@@ -131,6 +133,7 @@ route("PATCH", "/workspaces/:id", async (req, params) => {
   if (body.model !== undefined) ws.model = body.model;
   if (body.effort !== undefined) ws.effort = body.effort;
   if (body.maxContextSize !== undefined) ws.maxContextSize = body.maxContextSize;
+  if (body.executionDelay !== undefined) ws.executionDelay = body.executionDelay;
 
   saveConfig();
 

@@ -24,6 +24,7 @@ export interface WorkspaceConfig {
   model?: string;
   effort?: string;
   maxContextSize?: number;
+  executionDelay?: number;
 }
 
 export interface HiveConfig {
