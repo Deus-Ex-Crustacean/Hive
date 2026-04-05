@@ -56,6 +56,8 @@ route("GET", "/workspaces", () => {
       enabled: ws.enabled,
       running: isRunning(ws.id),
       status: isRunning(ws.id) ? getSynapseStatus(ws.path) : "stopped",
+      model: ws.model || "haiku",
+      effort: ws.effort || "low",
     }))
   );
 });
@@ -105,7 +107,7 @@ route("GET", "/workspaces/:id", (_req, params) => {
   const config = getConfig();
   const ws = config.workspaces.find((w) => w.id === params.id);
   if (!ws) return err("Workspace not found", 404);
-  return json({ id: ws.id, name: ws.name, path: ws.path, enabled: ws.enabled, running: isRunning(ws.id), status: isRunning(ws.id) ? getSynapseStatus(ws.path) : "stopped" });
+  return json({ id: ws.id, name: ws.name, path: ws.path, enabled: ws.enabled, running: isRunning(ws.id), status: isRunning(ws.id) ? getSynapseStatus(ws.path) : "stopped", model: ws.model || "haiku", effort: ws.effort || "low" });
 });
 
 route("PATCH", "/workspaces/:id", async (req, params) => {
@@ -117,14 +119,25 @@ route("PATCH", "/workspaces/:id", async (req, params) => {
     name?: string;
     path?: string;
     enabled?: boolean;
+    model?: string;
+    effort?: string;
   };
 
   if (body.name !== undefined) ws.name = body.name;
   if (body.path !== undefined) ws.path = body.path;
   if (body.enabled !== undefined) ws.enabled = body.enabled;
+  const needsRestart = (body.model !== undefined && body.model !== ws.model) || (body.effort !== undefined && body.effort !== ws.effort);
+  if (body.model !== undefined) ws.model = body.model;
+  if (body.effort !== undefined) ws.effort = body.effort;
 
   saveConfig();
-  return json({ id: ws.id, name: ws.name, path: ws.path, enabled: ws.enabled, running: isRunning(ws.id) });
+
+  if (needsRestart && isRunning(ws.id)) {
+    await stopWorkspace(ws.id);
+    await startWorkspace(ws.id);
+  }
+
+  return json({ id: ws.id, name: ws.name, path: ws.path, enabled: ws.enabled, running: isRunning(ws.id), model: ws.model || "haiku", effort: ws.effort || "low" });
 });
 
 route("DELETE", "/workspaces/:id", async (_req, params) => {

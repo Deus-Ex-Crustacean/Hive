@@ -21,6 +21,8 @@ export interface WorkspaceConfig {
   machineUserClientId: string;
   machineUserClientSecret: string;
   enabled: boolean;
+  model?: string;
+  effort?: string;
 }
 
 export interface HiveConfig {

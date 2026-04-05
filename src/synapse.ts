@@ -62,6 +62,8 @@ export async function startWorkspace(workspaceId: string): Promise<void> {
       EVENT_TYPES: eventTypes.join(","),
       WORKSPACE_ID: ws.id,
       WORKSPACE_NAME: ws.name,
+      CLAUDE_MODEL: ws.model || "haiku",
+      CLAUDE_EFFORT: ws.effort || "low",
     },
   });
 
