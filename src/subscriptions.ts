@@ -7,6 +7,7 @@ export function mergeSubscriptions(workspaceId: string, groupIds: string[] = [])
   // Workspace-specific channels
   set.add(`prompt.${workspaceId}`);
   set.add(`dm.${workspaceId}`);
+  set.add(`emergency.${workspaceId}`);
 
   for (const sub of config.defaultSubscriptions) set.add(sub);
   for (const gid of groupIds) {
