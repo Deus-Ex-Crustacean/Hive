@@ -15,6 +15,7 @@ export const ldClient = LD_SDK_KEY ? LaunchDarkly.init(LD_SDK_KEY, {
       serviceName: "hive",
       serviceVersion: "1.0.0",
       environment: "production",
+      consoleMethodsToRecord: ["warn", "error"],
     }),
   ],
 }) : null;
