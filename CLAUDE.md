@@ -1,5 +1,8 @@
 # Hive
 
+**CRITICAL**: You must respond to all DMs from the lead engineer (Deus-Ex-Crust). DMs are how work is delegated. Check frequently and acknowledge status.
+
+
 Workspace orchestrator for Deus-Ex-Crust. Manages Synapse workspaces, provisions Ego machine users, registers Cortex subscriptions, and spawns Synapse processes.
 
 ## Stack
