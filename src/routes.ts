@@ -126,16 +126,10 @@ route("PATCH", "/workspaces/:id", async (req, params) => {
   if (body.name !== undefined) ws.name = body.name;
   if (body.path !== undefined) ws.path = body.path;
   if (body.enabled !== undefined) ws.enabled = body.enabled;
-  const needsRestart = (body.model !== undefined && body.model !== ws.model) || (body.effort !== undefined && body.effort !== ws.effort);
   if (body.model !== undefined) ws.model = body.model;
   if (body.effort !== undefined) ws.effort = body.effort;
 
   saveConfig();
-
-  if (needsRestart && isRunning(ws.id)) {
-    await stopWorkspace(ws.id);
-    await startWorkspace(ws.id);
-  }
 
   return json({ id: ws.id, name: ws.name, path: ws.path, enabled: ws.enabled, running: isRunning(ws.id), model: ws.model || "haiku", effort: ws.effort || "low" });
 });
