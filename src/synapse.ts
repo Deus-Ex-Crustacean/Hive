@@ -3,7 +3,6 @@ import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { getConfig } from "./config";
 import { mergeSubscriptions } from "./subscriptions";
-import { ldClient } from "./ld";
 
 interface ManagedProcess {
   proc: Subprocess;
@@ -89,10 +88,7 @@ export async function startWorkspace(workspaceId: string): Promise<void> {
 
   const eventTypes = mergeSubscriptions(ws.id);
 
-  const wsLdContext = { kind: "workspace" as const, key: ws.id, name: ws.name };
-  const model = ldClient
-    ? await ldClient.stringVariation("ai-model", wsLdContext, ws.model || "claude-haiku-4-5-20251001")
-    : (ws.model || "claude-haiku-4-5-20251001");
+  const model = ws.model || "haiku";
   const effort = ws.effort || "low";
 
   const synapseEntry = join(process.env.HOME || "/home/brooswit", ".bun/install/global/node_modules/deus-ex-synapse/src/index.ts");
