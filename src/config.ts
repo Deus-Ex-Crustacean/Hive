@@ -23,6 +23,7 @@ export interface WorkspaceConfig {
   enabled: boolean;
   model?: string;
   effort?: string;
+  maxContextSize?: number;
 }
 
 export interface HiveConfig {

@@ -107,6 +107,7 @@ export async function startWorkspace(workspaceId: string): Promise<void> {
       WORKSPACE_NAME: ws.name,
       CLAUDE_MODEL: model,
       CLAUDE_EFFORT: effort,
+      SESSION_MAX_SIZE_MB: String(ws.maxContextSize ?? 5),
     },
   });
 
